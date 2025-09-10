@@ -1,5 +1,4 @@
 fastapi
 uvicorn
 pinecone
-pinecone-plugins
 openai
