@@ -2,7 +2,13 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import os
 from pinecone import Pinecone
-from pinecone.assistant import Assistant, Message  # type: ignore
+try:
+    from pinecone.assistant import Assistant, Message  # type: ignore
+except Exception:
+    try:
+        from pinecone_plugins.assistant import Assistant, Message  # type: ignore
+    except Exception:
+        from pinecone_plugin_assistant import Assistant, Message  # type: ignore
 
 # 初始化 FastAPI
 app = FastAPI(title="Powmr AI Assistant (Pinecone API)")
