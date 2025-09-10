@@ -1,5 +1,4 @@
 fastapi
 uvicorn
-pydantic
-pinecone-client>=3.0.0
 openai
+pinecone>=3.0.0
