@@ -4,20 +4,119 @@
     <meta charset="UTF-8">
     <title>PowMr AI Assistant</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        #chat-box { max-width: 800px; margin: 0 auto; height: 600px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; background: #f9f9f9; }
-        .message { margin-bottom: 15px; }
-        .user { color: #1a73e8; font-weight: bold; }
-        .assistant { color: #0b8043; }
-        input { width: 70%; padding: 8px; }
-        button { padding: 8px 12px; }
+        /* 页面整体 */
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 0;
+        }
+
+        /* 聊天容器 */
+        #chat-container {
+            width: 800px;
+            max-width: 95%;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 消息显示区 */
+        #chat-box {
+            flex: 1;
+            padding: 20px;
+            height: 600px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 单条消息样式 */
+        .message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            line-height: 1.5;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .user {
+            background-color: #1a73e8;
+            color: white;
+            align-self: flex-end;
+        }
+
+        .assistant {
+            background-color: #f1f3f4;
+            color: #202124;
+            align-self: flex-start;
+        }
+
+        /* 输入区域 */
+        #input-area {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            background-color: #fff;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            outline: none;
+        }
+
+        #user-input:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+        }
+
+        #send-btn {
+            margin-left: 10px;
+            padding: 12px 20px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #send-btn:hover {
+            background-color: #1666c1;
+        }
+
+        /* Markdown 内部样式优化 */
+        .assistant h1, .assistant h2, .assistant h3 {
+            margin: 8px 0;
+        }
+        .assistant ul {
+            padding-left: 20px;
+            margin: 5px 0;
+        }
+        .assistant li {
+            margin-bottom: 6px;
+        }
     </style>
 </head>
 <body>
-    <h1>PowMr AI Assistant</h1>
-    <div id="chat-box"></div>
-    <input type="text" id="user-input" placeholder="Type your question...">
-    <button id="send-btn">Send</button>
+    <div id="chat-container">
+        <div id="chat-box"></div>
+        <div id="input-area">
+            <input type="text" id="user-input" placeholder="Type your question...">
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
 
     <!-- 引入 marked.js 渲染 Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -44,6 +143,7 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ question })
             });
+
             const data = await res.json();
             const answer = data.answer;
 
