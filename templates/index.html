@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Pinecone Assistant</title>
+  <title>PowMr AI Assistant</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,11 +14,11 @@
       margin: 0;
     }
     .chat-container {
-      width: 400px;
-      height: 600px;
+      width: 600px;    /* wider */
+      height: 750px;   /* taller */
       background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -26,22 +26,24 @@
     .chat-header {
       background: #0073e6;
       color: white;
-      padding: 15px;
+      padding: 18px;
       text-align: center;
       font-weight: bold;
+      font-size: 18px;
     }
     #chat-box {
       flex: 1;
-      padding: 15px;
+      padding: 20px;
       overflow-y: auto;
       background: #fafafa;
+      font-size: 15px;
     }
     .message {
       margin: 10px 0;
       max-width: 80%;
-      padding: 10px;
-      border-radius: 10px;
-      line-height: 1.4;
+      padding: 12px 14px;
+      border-radius: 12px;
+      line-height: 1.5;
       word-wrap: break-word;
     }
     .user {
@@ -63,17 +65,17 @@
     #message {
       flex: 1;
       border: none;
-      padding: 15px;
-      font-size: 14px;
+      padding: 18px;
+      font-size: 15px;
       outline: none;
     }
     #send {
       background: #0073e6;
       color: white;
       border: none;
-      padding: 0 20px;
+      padding: 0 28px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 15px;
     }
     #send:hover {
       background: #005bb5;
@@ -82,7 +84,7 @@
 </head>
 <body>
   <div class="chat-container">
-    <div class="chat-header">🤖 Pinecone Assistant</div>
+    <div class="chat-header">⚡ PowMr AI Assistant</div>
     <div id="chat-box"></div>
     <div class="input-area">
       <input id="message" type="text" placeholder="Type your message...">
@@ -104,14 +106,13 @@
       return div;
     }
 
-    // 打字机效果函数
     function typeWriter(element, text, speed = 30) {
       let i = 0;
       function typing() {
         if (i < text.length) {
           element.textContent += text.charAt(i);
           i++;
-          chatBox.scrollTop = chatBox.scrollHeight; // 保持滚动到底部
+          chatBox.scrollTop = chatBox.scrollHeight;
           setTimeout(typing, speed);
         }
       }
@@ -124,7 +125,6 @@
       appendMessage('user', text);
       input.value = "";
 
-      // 先插入一个空 bot 消息
       const botDiv = appendMessage('bot', "");
 
       try {
@@ -135,7 +135,6 @@
         });
         const data = await res.json();
 
-        // 使用打字效果显示回答
         typeWriter(botDiv, data.answer, 30);
       } catch (err) {
         botDiv.textContent = "⚠️ Error connecting to assistant";
