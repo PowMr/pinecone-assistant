@@ -1,150 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>PowMr AI Assistant</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .chat-container {
-      width: 600px;    /* wider */
-      height: 750px;   /* taller */
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .chat-header {
-      background: #0073e6;
-      color: white;
-      padding: 18px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 18px;
-    }
-    #chat-box {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      background: #fafafa;
-      font-size: 15px;
-    }
-    .message {
-      margin: 10px 0;
-      max-width: 80%;
-      padding: 12px 14px;
-      border-radius: 12px;
-      line-height: 1.5;
-      word-wrap: break-word;
-    }
-    .user {
-      background: #0073e6;
-      color: white;
-      margin-left: auto;
-      border-bottom-right-radius: 0;
-    }
-    .bot {
-      background: #e6e6e6;
-      color: black;
-      margin-right: auto;
-      border-bottom-left-radius: 0;
-    }
-    .input-area {
-      display: flex;
-      border-top: 1px solid #ddd;
-    }
-    #message {
-      flex: 1;
-      border: none;
-      padding: 18px;
-      font-size: 15px;
-      outline: none;
-    }
-    #send {
-      background: #0073e6;
-      color: white;
-      border: none;
-      padding: 0 28px;
-      cursor: pointer;
-      font-size: 15px;
-    }
-    #send:hover {
-      background: #005bb5;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>PowMr AI Assistant</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #chat-box { max-width: 800px; margin: 0 auto; height: 600px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; background: #f9f9f9; }
+        .message { margin-bottom: 15px; }
+        .user { color: #1a73e8; font-weight: bold; }
+        .assistant { color: #0b8043; }
+        input { width: 70%; padding: 8px; }
+        button { padding: 8px 12px; }
+    </style>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="chat-header">⚡ PowMr AI Assistant</div>
+    <h1>PowMr AI Assistant</h1>
     <div id="chat-box"></div>
-    <div class="input-area">
-      <input id="message" type="text" placeholder="Type your message...">
-      <button id="send">Send</button>
-    </div>
-  </div>
+    <input type="text" id="user-input" placeholder="Type your question...">
+    <button id="send-btn">Send</button>
 
-  <script>
-    const chatBox = document.getElementById('chat-box');
-    const input = document.getElementById('message');
-    const sendBtn = document.getElementById('send');
+    <!-- 引入 marked.js 渲染 Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        const chatBox = document.getElementById("chat-box");
+        const input = document.getElementById("user-input");
+        const sendBtn = document.getElementById("send-btn");
 
-    function appendMessage(sender, text = "") {
-      const div = document.createElement('div');
-      div.className = `message ${sender}`;
-      div.textContent = text;
-      chatBox.appendChild(div);
-      chatBox.scrollTop = chatBox.scrollHeight;
-      return div;
-    }
+        async function sendMessage() {
+            const question = input.value.trim();
+            if (!question) return;
 
-    function typeWriter(element, text, speed = 30) {
-      let i = 0;
-      function typing() {
-        if (i < text.length) {
-          element.textContent += text.charAt(i);
-          i++;
-          chatBox.scrollTop = chatBox.scrollHeight;
-          setTimeout(typing, speed);
+            // 显示用户消息
+            const userDiv = document.createElement("div");
+            userDiv.className = "message user";
+            userDiv.innerText = question;
+            chatBox.appendChild(userDiv);
+
+            input.value = "";
+
+            // 调用后端 /ask API
+            const res = await fetch("/ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ question })
+            });
+            const data = await res.json();
+            const answer = data.answer;
+
+            // 渲染 Markdown
+            const assistantDiv = document.createElement("div");
+            assistantDiv.className = "message assistant";
+            assistantDiv.innerHTML = marked.parse(answer);
+            chatBox.appendChild(assistantDiv);
+
+            // 滚动到最新消息
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
-      }
-      typing();
-    }
 
-    async function sendMessage() {
-      const text = input.value.trim();
-      if (!text) return;
-      appendMessage('user', text);
-      input.value = "";
-
-      const botDiv = appendMessage('bot', "");
-
-      try {
-        const res = await fetch("/ask", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question: text })
-        });
-        const data = await res.json();
-
-        typeWriter(botDiv, data.answer, 30);
-      } catch (err) {
-        botDiv.textContent = "⚠️ Error connecting to assistant";
-      }
-    }
-
-    sendBtn.addEventListener('click', sendMessage);
-    input.addEventListener('keypress', (e) => {
-      if (e.key === "Enter") sendMessage();
-    });
-  </script>
+        sendBtn.addEventListener("click", sendMessage);
+        input.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
+    </script>
 </body>
 </html>
