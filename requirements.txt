@@ -2,3 +2,4 @@ fastapi
 uvicorn
 openai
 pinecone>=3.0.0
+jinja2
